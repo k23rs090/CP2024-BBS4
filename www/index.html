@@ -143,15 +143,25 @@ function escapeHtml(str) {
 }
 
 // タイムスタンプのフォーマット
+// タイムスタンプのフォーマット（相対時間）
 function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const now = new Date();
+    const postDate = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - postDate) / 1000);
+
+    // 経過時間を計算
+    if (diffInSeconds < 60) {
+        return `${diffInSeconds}秒前`;
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes}分前`;
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours}時間前`;
+    } else {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days}日前`;
+    }
 }
 
 // 投稿の編集権限チェック
@@ -448,7 +458,7 @@ function updateUI(user) {
     if (user) {
         $('.logged-in').show();
         $('.logged-out').hide();
-        $('#userEmail').text(user.uid);
+        $('#userEmail').text(user.email);
     } else {
         $('.logged-in').hide();
         $('.logged-out').show();
